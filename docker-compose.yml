@@ -1,0 +1,10 @@
+version: '2'
+services:
+  proxy:
+    restart: always
+    image: lloydzhou/nginx-proxy-connect
+    ports:
+      - "7777:7777"
+    volumes:
+      - ./proxy.conf:/etc/nginx/nginx.conf
+
