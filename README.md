@@ -13,3 +13,8 @@ sudo docker run --rm -it -p 7777:7777 lloydzhou/nginx-proxy-connect:latest
 ```
 curl -v -x http://127.0.0.1:7777 https://www.baidu.com
 ```
+
+# TODO
+1. https
+2. auth: using openresty + lua
+
