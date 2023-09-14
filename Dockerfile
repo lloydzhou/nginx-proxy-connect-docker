@@ -28,6 +28,9 @@ RUN apk add patch && patch -p1 < /data/nginx_proxy/patch/proxy_connect_rewrite_1
   --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' --add-module=/data/nginx_proxy \
   && make -j2 && make install && rm -rf /data/nginx_proxy
 
+# TODO
+RUN strip /usr/sbin/nginx
+
 FROM alpine:3.17.4
 
 COPY --from=builder /usr/lib/libpcre.so.1 /usr/lib/libpcre.so.1
