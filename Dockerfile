@@ -35,6 +35,9 @@ COPY --from=builder /usr/lib/libpcre.so.1.2.13 /usr/lib/libpcre.so.1.2.13
 COPY --from=builder /etc/nginx /etc/nginx
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 
+# default config
+ADD proxy.conf /etc/nginx/nginx.conf
+
 RUN mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx
 
 CMD ["nginx", "-g", "daemon off;"]
