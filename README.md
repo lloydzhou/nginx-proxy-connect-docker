@@ -6,7 +6,7 @@ sudo docker build -t lloydzhou/nginx-proxy-connect -f Dockerfile .
 
 # run 
 ```
-sudo docker run --rm -it -p 7777:7777 /lloydzhou/nginx-proxy-connect:latest
+sudo docker run --rm -it -p 7777:7777 lloydzhou/nginx-proxy-connect:latest
 ```
 
 # test
