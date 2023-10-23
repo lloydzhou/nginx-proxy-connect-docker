@@ -2,16 +2,16 @@ FROM alpine:3.17.4 as builder
 
 RUN mkdir /data && cd /data
 WORKDIR /data
-RUN wget http://nginx.org/download/nginx-1.25.0.tar.gz
+
+RUN wget https://openresty.org/download/openresty-1.19.3.1.tar.gz
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
 RUN apk add git && git clone https://github.com/chobits/ngx_http_proxy_connect_module.git nginx_proxy 
-RUN tar -zxvf nginx-1.25.0.tar.gz && rm -f nginx-1.25.0.tar.gz
+RUN tar -zxvf openresty-1.19.3.1.tar.gz && rm -f openresty-1.19.3.1.tar.gz
 
-WORKDIR /data/nginx-1.25.0
-RUN apk add patch && patch -p1 < /data/nginx_proxy/patch/proxy_connect_rewrite_102101.patch \
-  && apk add gcc g++ linux-headers pcre-dev openssl-dev zlib-dev make \
+WORKDIR /data/openresty-1.19.3.1
+RUN apk add patch gcc g++ linux-headers pcre-dev openssl-dev zlib-dev make perl \
   && mkdir -p /var/cache/nginx && ./configure --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules \
   --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log \
   --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid \
@@ -26,6 +26,7 @@ RUN apk add patch && patch -p1 < /data/nginx_proxy/patch/proxy_connect_rewrite_1
   --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module \
   --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
   --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' --add-module=/data/nginx_proxy \
+  && patch -d build/nginx-1.19.3/ -p 1 < /data/nginx_proxy/patch/proxy_connect_rewrite_101504.patch \
   && make -j2 && make install && rm -rf /data/nginx_proxy
 
 # TODO
@@ -35,11 +36,14 @@ FROM alpine:3.17.4
 
 COPY --from=builder /usr/lib/libpcre.so.1 /usr/lib/libpcre.so.1
 COPY --from=builder /usr/lib/libpcre.so.1.2.13 /usr/lib/libpcre.so.1.2.13
+COPY --from=builder /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
 COPY --from=builder /etc/nginx /etc/nginx
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 
 # default config
 ADD proxy.conf /etc/nginx/nginx.conf
+ADD htpasswd /etc/nginx/htpasswd
+ADD proxy_auth.lua /etc/nginx/proxy_auth.lua
 
 RUN mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx
 

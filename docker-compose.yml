@@ -7,4 +7,6 @@ services:
       - "7777:7777"
     volumes:
       - ./proxy.conf:/etc/nginx/nginx.conf
+      - ./htpasswd:/etc/htpasswd
+      - ./proxy_auth.lua:/etc/nginx/proxy_auth.lua
 

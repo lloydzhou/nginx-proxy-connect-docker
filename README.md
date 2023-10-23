@@ -6,6 +6,7 @@ sudo docker build -t lloydzhou/nginx-proxy-connect -f Dockerfile .
 
 # run 
 ```
+htpasswd -c htpasswd lloyd:lloyd
 sudo docker run --rm -it -p 7777:7777 lloydzhou/nginx-proxy-connect:latest
 ```
 
